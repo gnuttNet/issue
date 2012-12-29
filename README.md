@@ -1,4 +1,4 @@
 gnuttTrac
 =========
 
-Issuetracer using PHP and SQLite. For minimal administration upon setup
+Issuetracker using PHP and SQLite. For minimal administration upon setup
