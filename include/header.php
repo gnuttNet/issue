@@ -1,4 +1,4 @@
-<?php include_once("../settings.php");?>
+<?php include_once("settings.php");?>
 <?php include_once("cookies.php");?>
 <html>
 	</head>
