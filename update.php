@@ -1,7 +1,7 @@
 <?php
 	include("include/cookies.php");
 
-$db_user = new SQLite3("db/users.sqlite");
+$db_user = new SQLite3("db/tracker.sqlite");
 
 if($_POST['what'] == 'login') {
 	$salt = $db_user->querySingle("SELECT salt FROM users WHERE email=\"$_POST[email]\"");
@@ -21,6 +21,10 @@ if($_POST['what'] == 'login') {
 		die();
 	}
 
+}
+
+if($_POST['what'] == 'postissue') {
+	print_r($_POST);
 }
 
 die("UNDEFINED");
