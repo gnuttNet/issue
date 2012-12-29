@@ -16,7 +16,7 @@
 		echo "<a href=\"login.php\">Login</a>";
 	} else {
 		echo "<a href=\"issue.php?id=new\">[+] New Issue</a> | ";
-		echo "<a href=\"listissues.php\">View Issues</a> | ";
+		echo "<a href=\"listissues.php\">List Issues</a> | ";
 		echo $_SESSION['EMAIL'];
 		echo " | <a href=\"logout.php\">Logout</a>";
 	}
