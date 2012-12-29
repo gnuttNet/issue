@@ -6,4 +6,10 @@
 	echo "Adding Administrator user with email: admin@localhost, password: admin\n";
 	$db->exec("CREATE TABLE issues(title text, description text, owner integer, assigned integer, createdate integer, updated integer)");
 	$db->close();
+
+	chgrp("db/tracker.sqlite", "www-data");
+	chmod("db/tracker.sqlite", 0664);
+	chmod("db", 0775);
+	chgrp("db", "www-data");
+	
 ?>
