@@ -19,6 +19,12 @@
 	}
 ?>
 		<h1>Issue</h1>
+<?php
+	if(isset($_SESSION['message'])) {
+		echo "<p>$_SESSION[message]</p>\n";
+		unset($_SESSION['message']);
+	}
+?>
 		<form action="update.php" method="post">
 			<input type="hidden" name="what" value="postissue" />
 			<input type="hidden" name="issue" value="<?php echo $_GET['id'];?>" />

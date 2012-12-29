@@ -28,9 +28,11 @@ if($_POST['what'] == 'postissue') {
 	if($_POST['issue'] == "new") {
 		$db->exec("INSERT INTO issues(title,description,owner,assigned,createdate,updated) values(\"" . $db->escapeString($_POST['title']) . "\", \"" . $db->escapeString($_POST['description']) . "\", $_SESSION[UID], 0, $CURRENTTIME, $CURRENTTIME)");
 		$IID=$db->lastInsertRowID();
+		$_SESSION['message']="Created new issue $IID";
 	} else {
 		$db->exec("UPDATE issues SET title=\"" . $db->escapeString($_POST['title']) . "\", description=\"" . $db->escapeString($_POST['description']) . "\", assigned=$_POST[assigned], updated=$CURRENTTIME WHERE _ROWID_=$_POST[issue]");
 		$IID=$_POST['issue'];
+		$_SESSION['message']="Updated issue #$IID at " . strftime("%H:%I:%S", $CURRENTTIME);
 	}
 	header("Location: issue.php?id=$IID");
 	die();
