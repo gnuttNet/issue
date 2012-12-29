@@ -13,7 +13,7 @@
 	} else {
 		echo "<a href=\"newissue.php\">[+] New Issue</a> | ";
 		echo $_SESSION['EMAIL'];
-		echo "| <a href=\"logout.php\">Logout</a>";
+		echo " | <a href=\"logout.php\">Logout</a>";
 	}
 ?>
 	</div>
