@@ -24,13 +24,13 @@ if($_POST['what'] == 'login') {
 }
 
 if($_POST['what'] == 'postissue') {
+	$CURRENTTIME = strftime("%s");
 	if($_POST['issue'] == "new") {
-		$CURRENTTIME = strftime("%s");
-		$db->exec("INSERT INTO issues(title,description,owner,assigned,createdate,updated) values(\"" . $db->escapeString($_POST['title']) . "\", \"" . $db->escapeString($_POST['description']) . "\", $_SESSION[UID], -1, $CURRENTTIME, $CURRENTTIME)");
+		$db->exec("INSERT INTO issues(title,description,owner,assigned,createdate,updated) values(\"" . $db->escapeString($_POST['title']) . "\", \"" . $db->escapeString($_POST['description']) . "\", $_SESSION[UID], 0, $CURRENTTIME, $CURRENTTIME)");
 		$IID=$db->lastInsertRowID();
 	} else {
+		$db->exec("UPDATE issues SET title=\"" . $db->escapeString($_POST['title']) . "\", description=\"" . $db->escapeString($_POST['description']) . "\", assigned=$_POST[assigned], updated=$CURRENTTIME WHERE _ROWID_=$_POST[issue]");
 		$IID=$_POST['issue'];
-		die("NEIN");
 	}
 	header("Location: issue.php?id=$IID");
 	die();

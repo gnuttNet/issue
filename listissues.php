@@ -12,7 +12,7 @@
 	while($row = $result->fetchArray(SQLITE3_ASSOC)) {
 		echo "<tr>\n";
 		echo "<td>$row[issue]</td>\n";
-		echo "<td>$row[title]</td>\n";
+		echo "<td><a href=\"issue.php?id=$row[issue]\">$row[title]</a></td>\n";
 		echo "<td>";
 		if($row['assigned'] == -1) {
 			echo "Unassigned";
