@@ -26,7 +26,7 @@
 		echo "</td>\n";
 		echo "<td><a href=\"issue.php?id=$row[issue]\">$row[title]</a></td>\n";
 		echo "<td>";
-		if($row['assigned'] == -1) {
+		if($row['assigned'] == 0) {
 			echo "Unassigned";
 		} else {
 			$username = $db->querySingle("SELECT email FROM users WHERE _ROWID_=$row[assigned]");
