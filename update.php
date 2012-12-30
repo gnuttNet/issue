@@ -23,6 +23,11 @@ if($_POST['what'] == 'login') {
 
 }
 
+if(!isset($_SESSION['UID'])) {
+	header("Location: login.php");
+	die();
+}
+
 if($_POST['what'] == 'postissue') {
 	$CURRENTTIME = strftime("%s");
 	if($_POST['issue'] == "new") {
@@ -30,13 +35,19 @@ if($_POST['what'] == 'postissue') {
 		$IID=$db->lastInsertRowID();
 		$_SESSION['message']="Created new issue $IID";
 	} else {
-		$db->exec("UPDATE issues SET title=\"" . $db->escapeString($_POST['title']) . "\", description=\"" . $db->escapeString($_POST['description']) . "\", assigned=$_POST[assigned], updated=$CURRENTTIME WHERE _ROWID_=$_POST[issue]");
+		$db->exec("UPDATE issues SET title=\"" . $db->escapeString($_POST['title']) . "\", description=\"" . $db->escapeString($_POST['description']) . "\", assigned=$_POST[assigned], updated=$CURRENTTIME, status=$_POST[status] WHERE _ROWID_=$_POST[issue]");
 		$IID=$_POST['issue'];
 		$_SESSION['message']="Updated issue #$IID at " . strftime("%H:%I:%S", $CURRENTTIME);
 	}
 	header("Location: issue.php?id=$IID");
 	die();
 }
+
+if($_POST['what'] == 'closeissues') {
+	print_r($_POST);
+	die();
+}
+
 
 die("UNDEFINED");
 ?>
