@@ -1,8 +1,8 @@
 <?php
-	include("include/cookies.php");
-	include_once( "include/password_functions.php" );
+	include("../include/cookies.php");
+	include_once( "../include/password_functions.php" );
 
-$db = new SQLite3("db/tracker.sqlite", SQLITE3_OPEN_READWRITE);
+$db = new SQLite3("../db/tracker.sqlite", SQLITE3_OPEN_READWRITE);
 
 if($_POST['what'] == 'login') {
 	$salt = $db->querySingle("SELECT salt FROM users WHERE email=\"$_POST[email]\"");
@@ -40,7 +40,7 @@ if($_POST['what'] == 'postissue') {
 		$IID=$_POST['issue'];
 		$_SESSION['message']="Updated issue #$IID at " . strftime("%H:%I:%S", $CURRENTTIME);
 	}
-	header("Location: issue.php?id=$IID");
+	header("Location: ../issue.php?id=$IID");
 	die();
 }
 

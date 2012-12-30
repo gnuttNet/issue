@@ -9,7 +9,7 @@ include( "include/header.php" );
 		unset( $_SESSION['message'] );
 	}
 ?>
-		<form action="update.php" method="post">
+		<form action="database/update.php" method="post">
 			<input type="hidden" name="what" value="changepassword" />
 			<label for="old_password">Old password:</label><input type="password" name="old_password" size="40" /> <br />
 			<label for="new_password">New password:</label><input type="password" name="new_password" size="40" /> <br />
