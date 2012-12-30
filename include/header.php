@@ -18,8 +18,8 @@
 	} else {
 		echo "<a href=\"issue.php?id=new\">[+] New Issue</a> | ";
 		echo "<a href=\"listissues.php\">List Issues</a> | ";
-		echo $_SESSION['EMAIL'];
-		echo " | <a href=\"logout.php\">Logout</a>";
+		echo "<a href=\"usersettings.php\">$_SESSION[EMAIL]</a> | ";
+		echo "<a href=\"logout.php\">Logout</a>";
 	}
 ?>
 	</div>
