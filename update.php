@@ -44,7 +44,10 @@ if($_POST['what'] == 'postissue') {
 }
 
 if($_POST['what'] == 'closeissues') {
-	print_r($_POST);
+	foreach(array_keys($_POST['close']) as $issue) {
+		$db->exec("UPDATE issues SET status=2 WHERE _ROWID_=$issue");
+	}
+	header("Location: $_SERVER[HTTP_REFERER]");
 	die();
 }
 
