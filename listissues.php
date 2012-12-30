@@ -4,11 +4,12 @@
 			<input type="hidden" name="what" value="closeissues" />
 			<input type="submit" value="Close" />
 <?php
-	$result = $db->query("SELECT issues._ROWID_ as issue, issues.title as title, issues.assigned as assigned, issues.updated as updated FROM issues");
+	$result = $db->query("SELECT issues._ROWID_ as issue, issues.title as title, issues.assigned as assigned, issues.updated as updated, status as status FROM issues");
 	echo "<table>\n";
 	echo "<tr>\n";
 	echo "<th />\n";
 	echo "<th>Issue #1</th>\n";
+	echo "<th>Status</th>\n";
 	echo "<th>Title</th>\n";
 	echo "<th>Assigned to</th>\n";
 	echo "<th>Last updated</th>\n";
@@ -18,6 +19,11 @@
 		echo "<tr>\n";
 		echo "<td><input type=\"checkbox\" name=\"close[$row[issue]]\" /></td>\n";
 		echo "<td>$row[issue]</td>\n";
+		echo "<td>";
+		if($row['status'] == 0) {echo "NEW";}
+		if($row['status'] == 1) {echo "Accepted";}
+		if($row['status'] == 2) {echo "Closed";}
+		echo "</td>\n";
 		echo "<td><a href=\"issue.php?id=$row[issue]\">$row[title]</a></td>\n";
 		echo "<td>";
 		if($row['assigned'] == -1) {
