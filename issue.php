@@ -12,6 +12,9 @@
 		$assigned = $issue['assigned'];
 		$status = $issue['status'];
 	} else {
+		$title = "";
+		$status = 0;
+		$description = "";
 		$createdate = strftime("%s");
 		$updated = strftime("%s");
 		$owner = $_SESSION['UID'];

@@ -1,4 +1,5 @@
 <?php
+	ini_set('display_errors', 1);
 	include_once("settings.php");
 	include_once("cookies.php");
 	include_once("functions.php");
