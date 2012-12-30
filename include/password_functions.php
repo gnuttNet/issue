@@ -1,7 +1,8 @@
 <?php
+	define( "AVAILABLE_CHARACTERS", 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!"\'#¤%&/()=?`;:_,.-<>|^*¨' );
+
 	function generateRandomString( $length = 8 ){
 		// Use of constant as we don't want to have to push this to the stack every time this function runs
-		define( "AVAILABLE_CHARACTERS", 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!"\'#¤%&/()=?`;:_,.-<>|^*¨' );
 
 		$string = "";
 		$characterCount = strlen( AVAILABLE_CHARACTERS );
@@ -13,4 +14,6 @@
 
 		return $string;
 	}
+	
+	
 ?>
