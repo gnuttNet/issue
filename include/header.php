@@ -1,6 +1,7 @@
 <?php
 	include_once("settings.php");
 	include_once("cookies.php");
+	include_once("functions.php");
 	
 	$db = new SQLite3("db/tracker.sqlite");
 ?>
