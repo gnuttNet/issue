@@ -10,7 +10,7 @@ if($_POST['what'] == 'login') {
 	$UID=$db->querySingle("SELECT _ROWID_ FROM users WHERE email=\"$_POST[email]\" AND password=\"$hash\"");
 	if(!isset($UID)) {
 		$_SESSION['ERROR'] = "Wrong username/password";
-		$_SESSOIN['RETURN'] = $_POST['return'];
+		$_SESSION['RETURN'] = $_POST['return'];
 		header("Location: login.php");
 		die();
 	} else {
