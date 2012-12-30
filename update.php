@@ -23,6 +23,11 @@ if($_POST['what'] == 'login') {
 
 }
 
+if(!isset($_SESSION['UID'])) {
+	header("Location: login.php");
+	die();
+}
+
 if($_POST['what'] == 'postissue') {
 	$CURRENTTIME = strftime("%s");
 	if($_POST['issue'] == "new") {
