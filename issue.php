@@ -16,7 +16,6 @@
 		$updated = strftime("%s");
 		$owner = $_SESSION['UID'];
 		$assigned = 0;
-
 	}
 ?>
 		<h1>Issue</h1>
@@ -43,9 +42,9 @@
 	$users = $db->query("SELECT _ROWID_ as UID, email FROM users ORDER BY email");
 	while($row = $users->fetchArray(SQLITE3_ASSOC)) {
 		if($assigned == $row['UID']) {
-			echo "<option value=\"$row[UID]\" SELECTED>$row[email]</option>\n";
+			echo "\t\t\t\t<option value=\"$row[UID]\" SELECTED>$row[email]</option>\n";
 		} else {
-			echo "<option value=\"$row[UID]\">$row[email]</option>\n";
+			echo "\t\t\t\t<option value=\"$row[UID]\">$row[email]</option>\n";
 		}
 	}
 ?>
@@ -53,5 +52,11 @@
 			<br />
 			<label for="description">Description:</label><textarea name="description" rows="25" cols="80"><?php echo $description;?></textarea><br />
 			<input type="submit" value="Post" />
+<?php
+	$strCDate = strftime("%Y-%m-%d %H:%I:%S", $createdate);
+	$strMDate = strftime("%Y-%m-%d %H:%I:%S", $updated);
+	$strCreator = $db->querySingle("SELECT email FROM users WHERE _ROWID_=$owner");
+	echo "\t\t\t<p>Issue created $strCDate by $strCreator. Last updated $strMDate</p>\n";
+?>
 		</form>
 <?php include("include/footer.php");?>
