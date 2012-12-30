@@ -1,7 +1,7 @@
 <?php include("include/header.php");?>
 <?php
 	if($_GET['id'] != "new") {
-		$result = $db->query("SELECT title,description,owner,assigned,createdate,updated FROM issues WHERE _ROWID_=$_GET[id]");
+		$result = $db->query("SELECT title,description,owner,assigned,createdate,updated,status FROM issues WHERE _ROWID_=$_GET[id]");
 		$issue = $result->fetchArray(SQLITE3_ASSOC);
 	
 		$title = $issue['title'];	
@@ -10,6 +10,7 @@
 		$updated = $issue['updated'];
 		$owner = $issue['owner'];
 		$assigned = $issue['assigned'];
+		$status = $issue['status'];
 	} else {
 		$createdate = strftime("%s");
 		$updated = strftime("%s");
@@ -28,7 +29,13 @@
 		<form action="update.php" method="post">
 			<input type="hidden" name="what" value="postissue" />
 			<input type="hidden" name="issue" value="<?php echo $_GET['id'];?>" />
-			<label for="title">Title:</label><input type="text" name="title" value="<?php echo $title;?>"/>
+			<label for="title">Title:</label><input type="text" name="title" value="<?php echo $title;?>" size="40" />
+			<label for="status">Status</label>
+			<select name="status">
+				<option value="0" <?php if($status == 0) {echo "SELECTED";}?>>NEW</option>
+				<option value="1" <?php if($status == 1) {echo "SELECTED";}?>>Accepted</option>
+				<option value="2" <?php if($status == 2) {echo "SELECTED";}?>>Closed</option>
+			</select>
 			<label for="assigned">Assigned to:</label>
 			<select name="assigned">
 				<option value="0">Unassigned</option>
