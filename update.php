@@ -1,5 +1,6 @@
 <?php
 	include("include/cookies.php");
+	include_once( "include/password_functions.php" );
 
 $db = new SQLite3("db/tracker.sqlite", SQLITE3_OPEN_READWRITE);
 
@@ -51,6 +52,39 @@ if($_POST['what'] == 'closeissues') {
 	die();
 }
 
+if( $_POST["what"] == "changepassword" )
+{
+	if( $_POST["old_password"] != "" && $_POST["new_password"] != "" && $_POST["confirm_password"] != "" )
+	{
+		if( $_POST["new_password"] == $_POST["confirm_password"] )
+		{
+			$result = $db->query("SELECT password,salt FROM users WHERE email=\"".$_SESSION['EMAIL']."\"");
+			$passwordSalt = $result->fetchArray(SQLITE3_ASSOC);
+			$oldPassword = sha1($_POST["old_password"].$passwordSalt['salt']);
+			if( $passwordSalt['password'] == $oldPassword )
+			{
+				$newPassword = sha1($_POST["new_password"].$passwordSalt['salt']);
+				$db->query("UPDATE users SET password=\"".$newPassword."\" WHERE email=\"".$_SESSION['EMAIL']."\"");
+				$_SESSION['message'] = "Password updated";
+			}
+			else
+			{
+				$_SESSION['message'] = "Old password doesn't match";
+			}
+		}
+		else
+		{
+			$_SESSION['message'] = "Passwords do not match";
+		}
+	}
+	else
+	{
+		$_SESSION['message'] = "Not all fields set";
+	}
+	
+	header("Location: $_SERVER[HTTP_REFERER]");
+	die();
+}
 
 die("UNDEFINED");
 ?>
