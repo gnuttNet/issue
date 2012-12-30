@@ -4,7 +4,7 @@
 			<input type="hidden" name="what" value="closeissues" />
 			<input type="submit" value="Close" />
 <?php
-	$result = $db->query("SELECT issues._ROWID_ as issue, issues.title as title, issues.assigned as assigned, issues.updated as updated, status as status FROM issues");
+	$result = $db->query("SELECT issues._ROWID_ as issue, issues.title as title, issues.assigned as assigned, issues.updated as updated, status as status FROM issues WHERE status IS NOT 2");
 	echo "<table>\n";
 	echo "<tr>\n";
 	echo "<th />\n";
