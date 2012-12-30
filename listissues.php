@@ -14,6 +14,7 @@
 	echo "<th>Last updated</th>\n";
 	echo "</tr>\n";
 	while($row = $result->fetchArray(SQLITE3_ASSOC)) {
+		if(strlen($row['title']) == 0) {$row['title'] = "&lt;Untitled&gt;";}
 		echo "<tr>\n";
 		echo "<td><input type=\"checkbox\" name=\"close[$row[issue]]\" /></td>\n";
 		echo "<td>$row[issue]</td>\n";
