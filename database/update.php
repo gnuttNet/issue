@@ -5,6 +5,7 @@
 $db = new SQLite3("../db/tracker.sqlite", SQLITE3_OPEN_READWRITE);
 
 if($_POST['what'] == 'login') {
+	$_POST['email'] = strtolower($_POST['email']);
 	$salt = $db->querySingle("SELECT salt FROM users WHERE email=\"$_POST[email]\"");
 	$hash = sha1($_POST['password'] . $salt );
 	$password = $db->querySingle("SELECT password from users where email=\"$_POST[email]\"");
