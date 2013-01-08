@@ -12,12 +12,14 @@
 		$assigned = $issue['assigned'];
 		$status = $issue['status'];
 	} else {
+		$user = User::GetUserFromSession();
+
 		$title = "";
 		$status = 0;
 		$description = "";
 		$createdate = strftime("%s");
 		$updated = strftime("%s");
-		$owner = $_SESSION['UID'];
+		$owner = $user->GetUID();
 		$assigned = 0;
 	}
 ?>

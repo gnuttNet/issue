@@ -1,32 +1,27 @@
 <?php
 	include("../include/cookies.php");
+	include_once( "../include/user.php" );
 	include_once( "../include/password_functions.php" );
 
 $db = new SQLite3("../db/tracker.sqlite", SQLITE3_OPEN_READWRITE);
 
+User::Init( $db );
+$user = User::GetUserFromSession();
+
 if($_POST['what'] == 'login') {
-	$_POST['email'] = strtolower($_POST['email']);
-	$salt = $db->querySingle("SELECT salt FROM users WHERE email=\"$_POST[email]\"");
-	$hash = sha1($_POST['password'] . $salt );
-	$password = $db->querySingle("SELECT password from users where email=\"$_POST[email]\"");
-	$UID=$db->querySingle("SELECT _ROWID_ FROM users WHERE email=\"$_POST[email]\" AND password=\"$hash\"");
-	if(!isset($UID)) {
-		$_SESSION['ERROR'] = "Wrong username/password";
-		$_SESSION['RETURN'] = $_POST['return'];
-		header("Location: login.php");
+	if( User::Login( $_POST['email'], $_POST['password'] ) ) {
+		header("Location: {$_POST['return']}");
 		die();
 	} else {
-		$_SESSION['UID'] = $UID;
-		$_SESSION['EMAIL'] = $_POST['email'];
-		$_SESSION['ADMIN'] = $db->querySingle("SELECT admin FROM users WHERE _ROWID_ = $UID");
-		header("Location: $_POST[return]");
+		$_SESSION['ERROR'] = "Wrong username/password";
+		$_SESSION['RETURN'] = $_POST['return'];
+		header("Location: ../login.php");
 		die();
 	}
-
 }
 
-if(!isset($_SESSION['UID'])) {
-	header("Location: login.php");
+if(!$user->IsLoggedIn()) {
+	header("Location: ../login.php");
 	die();
 }
 
@@ -55,34 +50,8 @@ if($_POST['what'] == 'closeissues') {
 
 if( $_POST["what"] == "changepassword" )
 {
-	if( $_POST["old_password"] != "" && $_POST["new_password"] != "" && $_POST["confirm_password"] != "" )
-	{
-		if( $_POST["new_password"] == $_POST["confirm_password"] )
-		{
-			$result = $db->query("SELECT password,salt FROM users WHERE email=\"".$_SESSION['EMAIL']."\"");
-			$passwordSalt = $result->fetchArray(SQLITE3_ASSOC);
-			$oldPassword = sha1($_POST["old_password"].$passwordSalt['salt']);
-			if( $passwordSalt['password'] == $oldPassword )
-			{
-				$newPassword = sha1($_POST["new_password"].$passwordSalt['salt']);
-				$db->query("UPDATE users SET password=\"".$newPassword."\" WHERE email=\"".$_SESSION['EMAIL']."\"");
-				$_SESSION['message'] = "Password updated";
-			}
-			else
-			{
-				$_SESSION['message'] = "Old password doesn't match";
-			}
-		}
-		else
-		{
-			$_SESSION['message'] = "Passwords do not match";
-		}
-	}
-	else
-	{
-		$_SESSION['message'] = "Not all fields set";
-	}
-	
+	User::ChangePassword( $_POST["old_password"], $_POST["new_password"], $_POST["confirm_password"] );
+		
 	header("Location: $_SERVER[HTTP_REFERER]");
 	die();
 }
