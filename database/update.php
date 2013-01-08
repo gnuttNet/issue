@@ -6,7 +6,7 @@
 $db = new SQLite3("../db/tracker.sqlite", SQLITE3_OPEN_READWRITE);
 
 User::Init( $db );
-$user = User::GetUserFromSession();
+$user = User::GetFromSession();
 
 if($_POST['what'] == 'login') {
 	if( User::Login( $_POST['email'], $_POST['password'] ) ) {
@@ -41,16 +41,28 @@ if($_POST['what'] == 'postissue') {
 }
 
 if($_POST['what'] == 'closeissues') {
-	foreach(array_keys($_POST['close']) as $issue) {
-		$db->exec("UPDATE issues SET status=2 WHERE _ROWID_=$issue");
+	if( isset( $_POST['close'] ) )
+	{
+		foreach(array_keys($_POST['close']) as $issue) {
+			$db->exec("UPDATE issues SET status=2 WHERE _ROWID_=$issue");
+		}
 	}
+			
 	header("Location: $_SERVER[HTTP_REFERER]");
 	die();
 }
 
 if( $_POST["what"] == "changepassword" )
 {
-	User::ChangePassword( $_POST["old_password"], $_POST["new_password"], $_POST["confirm_password"] );
+	if( $_POST["new_password"] == $_POST["confirm_password"] ) {
+		$user = User::GetFromSession();
+		$user->ChangePassword( $_POST["old_password"], $_POST["new_password"] );
+	}
+	else
+	{
+		$_SESSION['message'] = "Passwords do not match";
+	}
+	
 		
 	header("Location: $_SERVER[HTTP_REFERER]");
 	die();
@@ -67,13 +79,32 @@ if( $_POST["what"] == "updateuser" )
 		$asAdmin = isset($_POST['isadmin']);
 		$user->SetAsAdmin( $asAdmin );
 		$user->CommitChanges();
+		
+		if( $_POST['new_password'] == $_POST['confirm_password'] )
+		{
+			$user->SetNewPassword( $_POST['new_password'] );
+		}
 	}
 	else
 	{
 		$_SESSION['ERROR'] = "Invalid user";
 	}
 
-	header("Location: ../usermanagement.php?id=1");
+	header("Location: ../usermanagement.php?id={$_POST['id']}");
+	die();
+}
+
+if( $_POST["what"] == "deleteusers" )
+{
+	if( isset($_POST['delete']) )
+	{
+		foreach( array_keys($_POST['delete']) as $userToDelete ) {
+			// @TODO: SQL injection (BIG WARNING HERE!)
+			User::DeleteFromUID( $userToDelete );
+		}
+	}
+
+	header("Location: ../usermanagement.php");
 	die();
 }
 

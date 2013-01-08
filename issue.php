@@ -13,7 +13,7 @@
 		$assigned = $issue['assigned'];
 		$status = $issue['status'];
 	} else {
-		$user = User::GetUserFromSession();
+		$user = User::GetFromSession();
 
 		$title = "";
 		$status = 0;

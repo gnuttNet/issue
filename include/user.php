@@ -1,11 +1,11 @@
 <?php
 
 include_once( "input_validation.php" );
+include_once( "password_functions.php" );
 
 error_reporting( E_ALL );
 
-abstract class User
-{
+abstract class User {
 	const INVALID_UID = -1;
 
 	// The names of the session variables used by the user object
@@ -26,8 +26,7 @@ abstract class User
 	}
 	
 	protected function __construct() {
-	}
-	
+	}	
 		
 	// User specific code
 	
@@ -45,7 +44,7 @@ abstract class User
 	abstract function SetRealName( $realName );	
 
 	
-	static function GetUserFromSession() {
+	static function GetFromSession() {
 		if( isset($_SESSION[self::SESSION_UID]) ) {
 			if( !isset( $CachedUser ) )
 			{
@@ -94,49 +93,28 @@ abstract class User
 		return $dbUser;
 	}
 	
+	static function DeleteFromUID( $UID ) {
+		User::$DB->exec("DELETE FROM users WHERE _ROWID_=$UID");
+	}
+	
 	abstract function CommitChanges();
 	
 	// Called whenever a user has logged in
 	static function UserLoggedIn( $UID, $email ) {
-		$_SESSION['UID'] = $UID;
-		$_SESSION['EMAIL'] = $email;
-		$_SESSION['ADMIN'] = User::$DB->querySingle("SELECT admin FROM users WHERE _ROWID_ = $UID");
+		$_SESSION[User::SESSION_UID] = $UID;
+		$_SESSION[User::SESSION_EMAIL] = $email;
+		$_SESSION[User::SESSION_ADMIN] = User::$DB->querySingle("SELECT admin FROM users WHERE _ROWID_ = $UID");
 	}
 	
-	// @TODO - refactor, as it can only be done on the current logged in user, and not on any user
-	static function ChangePassword( $oldPassword, $newPassword, $confirmPassword ) {
-		if( $oldPassword != "" && $newPassword != "" && $confirmPassword != "" )
-		{
-			if( $newPassword == $confirmPassword )
-			{
-				$result = User::$DB->query("SELECT password,salt FROM users WHERE email=\"".$_SESSION[User::SESSION_EMAIL]."\"");
-				$passwordSalt = $result->fetchArray(SQLITE3_ASSOC);
-				$oldHashedPassword = sha1( $oldPassword.$passwordSalt['salt'] );
-				if( $passwordSalt['password'] == $oldHashedPassword )
-				{
-					$newHashedPassword = sha1( $newPassword.$passwordSalt['salt'] );
-					User::$DB->query("UPDATE users SET password=\"".$newHashedPassword."\" WHERE email=\"".$_SESSION[User::SESSION_EMAIL]."\"");
-					$_SESSION['message'] = "Password updated";
-					
-					return true;
-				}
-				else
-				{
-					$_SESSION['message'] = "Old password doesn't match";
-				}
-			}
-			else
-			{
-				$_SESSION['message'] = "Passwords do not match";
-			}
-		}
-		else
-		{
-			$_SESSION['message'] = "Not all fields set";
-		}
-		
-		return false;
+	static function UpdateSessionWithUser( $user ) {
+		$_SESSION[User::SESSION_UID] = $user->GetUID();
+		$_SESSION[User::SESSION_EMAIL] = $user->GetEmail();
+		$_SESSION[User::SESSION_ADMIN] = $user->IsAdmin();
 	}
+	
+	abstract function ChangePassword( $oldPassword, $newPassword );
+	
+	abstract function SetNewPassword( $newPassword );
 	
 	static function Logout() {
 		session_destroy();
@@ -158,8 +136,7 @@ abstract class User
 	}
 }
 
-class GuestUser extends User
-{
+class GuestUser extends User {
 	protected function __construct() {
 		parent::__construct();
 	}
@@ -199,10 +176,17 @@ class GuestUser extends User
 	function CommitChanges() {
 		assert( false, "Called CommitChanges on GuestUser" );
 	}
+	
+	function SetNewPassword( $newPassword ) {
+		assert( false, "Called SetNewPassword on GuestUser" );
+	}
+	
+	function ChangePassword( $oldPassword, $newPassword ) {
+		assert( false, "Called ChangePassword on GuestUser" );
+	}
 }
 
-class RegisteredUser extends User
-{
+class RegisteredUser extends User {
 	private $Email;
 	private $RealName;
 	private $Admin;
@@ -256,7 +240,37 @@ class RegisteredUser extends User
 		return $this->RealName;
 	}
 	
+	function SetNewPassword( $newPassword ) {
+		$salt = generateRandomString( 8 );
+		$newHashedPassword = sha1( $newPassword.$salt );
+		User::$DB->exec("UPDATE users SET password=\"".$newHashedPassword."\",salt=\"".$salt."\" WHERE _ROWID_=\"".$this->UID."\"");
+	}
+	
+	function ChangePassword( $oldPassword, $newPassword ) {
+		$result = User::$DB->query("SELECT password,salt FROM users WHERE _ROWID_=\"".$this->UID."\"");
+		$passwordSalt = $result->fetchArray(SQLITE3_ASSOC);
+		$oldHashedPassword = sha1( $oldPassword.$passwordSalt['salt'] );
+		if( $passwordSalt['password'] == $oldHashedPassword ) {
+			$newHashedPassword = sha1( $newPassword.$passwordSalt['salt'] );
+			User::$DB->query("UPDATE users SET password=\"".$newHashedPassword."\" WHERE _ROWID_=\"".$this->UID."\"");
+			$_SESSION['message'] = "Password updated";
+			
+			return true;
+		}
+		else
+		{
+			$_SESSION['message'] = "Old password doesn't match";
+		}
+		
+		return false;
+	}
+		
 	function CommitChanges() {
+		if( User::GetFromSession()->GetUID() == $this->UID )
+		{
+			User::UpdateSessionWithUser( $this );
+		}
+	
 		$isAdmin = $this->Admin ? 1 : 0;
 		User::$DB->exec( "UPDATE users SET realname = '$this->RealName', admin = $isAdmin, email = '$this->Email' WHERE _ROWID_=$this->UID" );
 	}

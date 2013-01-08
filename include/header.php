@@ -18,7 +18,7 @@
 	<body>
 	<div id="header">
 <?php
-	$user = User::GetUserFromSession();
+	$user = User::GetFromSession();
 	if( !$user->IsLoggedIn() ) {
 		echo "<a href=\"login.php\">Login</a>";
 	} else {
