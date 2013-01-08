@@ -1,6 +1,6 @@
 <?php include("include/header.php"); ?>
 		<h1>List issues</h1>
-		<form action="update.php" method="post">
+		<form action="database/update.php" method="post">
 			<input type="hidden" name="what" value="closeissues" />
 			<input type="submit" value="Close" />
 <?php

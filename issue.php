@@ -12,6 +12,9 @@
 		$assigned = $issue['assigned'];
 		$status = $issue['status'];
 	} else {
+		$title = "";
+		$status = 0;
+		$description = "";
 		$createdate = strftime("%s");
 		$updated = strftime("%s");
 		$owner = $_SESSION['UID'];
@@ -25,7 +28,7 @@
 		unset($_SESSION['message']);
 	}
 ?>
-		<form action="update.php" method="post">
+		<form action="database/update.php" method="post">
 			<input type="hidden" name="what" value="postissue" />
 			<input type="hidden" name="issue" value="<?php echo $_GET['id'];?>" />
 			<label for="title">Title:</label><input type="text" name="title" value="<?php echo $title;?>" size="40" />

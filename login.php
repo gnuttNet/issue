@@ -6,7 +6,7 @@
 		unset($_SESSION['ERROR']);
 	} 
 ?>
-		<form action="update.php" method="post" />
+		<form action="database/update.php" method="post" />
 			<input type="hidden" name="what" value="login" />
 			<input type="hidden" name="return" value="<?php echo $_SERVER[HTTP_REFERER]; ?>" />
 			Email: <input type="text" name="email" />
