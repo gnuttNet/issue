@@ -1,6 +1,7 @@
 <?php include("include/header.php");?>
 <?php
 	if($_GET['id'] != "new") {
+		// @TODO: Sql-attack
 		$result = $db->query("SELECT title,description,owner,assigned,createdate,updated,status FROM issues WHERE _ROWID_=$_GET[id]");
 		$issue = $result->fetchArray(SQLITE3_ASSOC);
 	
@@ -60,6 +61,7 @@
 <?php
 	$strCDate = strftime("%Y-%m-%d %H:%I:%S", $createdate);
 	$strMDate = strftime("%Y-%m-%d %H:%I:%S", $updated);
+	// @TODO: Sql-injection
 	$strCreator = $db->querySingle("SELECT email FROM users WHERE _ROWID_=$owner");
 	echo "\t\t\t<p>Issue created $strCDate by $strCreator. Last updated $strMDate</p>\n";
 ?>

@@ -1,13 +1,14 @@
 <?php
- 
-// @TODO: Remove debug line
-include_once("cookies.php");
+
+include_once( "input_validation.php" );
+
 error_reporting( E_ALL );
 
 abstract class User
 {
+	const INVALID_UID = -1;
+
 	// The names of the session variables used by the user object
-	
 	// Stores a unique identifier of the user
 	const SESSION_UID = 'UID';
 	// Stores the current users email
@@ -26,6 +27,23 @@ abstract class User
 	
 	protected function __construct() {
 	}
+	
+		
+	// User specific code
+	
+	abstract function IsLoggedIn();
+	
+	abstract function IsAdmin();
+	abstract function SetAsAdmin( $newAsAdmin );
+	
+	abstract function GetEmail();
+	abstract function SetEmail( $newEmail );
+	
+	abstract function GetUID();
+	
+	abstract function GetRealName();
+	abstract function SetRealName( $realName );	
+
 	
 	static function GetUserFromSession() {
 		if( isset($_SESSION[self::SESSION_UID]) ) {
@@ -53,6 +71,30 @@ abstract class User
 		
 		return false;
 	}
+		
+	static function FromUID( $UID )	{
+		if( !isInt( $UID ) )
+		{
+			// Possible SQL injection attack (or just someone who tries to use the API incorrectly
+			return NULL;
+		}
+		
+		$result = User::$DB->query("SELECT email,realname,admin,_ROWID_ as UID FROM users WHERE _ROWID_ = $UID");
+		
+		$user = $result->fetchArray(SQLITE3_ASSOC);
+
+		if( $user == FALSE )
+		{
+			return NULL;
+		}
+
+		$dbUser = new RegisteredUser( $user['UID'], $user['email'], $user['admin'] );
+		$dbUser->SetRealName( $user['realname'] );
+		
+		return $dbUser;
+	}
+	
+	abstract function CommitChanges();
 	
 	// Called whenever a user has logged in
 	static function UserLoggedIn( $UID, $email ) {
@@ -96,18 +138,24 @@ abstract class User
 		return false;
 	}
 	
-	static function Logout()
-	{
+	static function Logout() {
 		session_destroy();
 	}
 	
-	abstract function IsLoggedIn();
+	// User management code
+	static function GetAllUsers() {
+		$users = array();
 	
-	abstract function IsAdmin();
-	
-	abstract function GetEmail();
-	
-	abstract function GetUID();
+		$result = User::$DB->query("SELECT email,realname,admin,_ROWID_ as UID FROM users");
+		
+		while( $user = $result->fetchArray(SQLITE3_ASSOC) ) {
+			$dbUser = new RegisteredUser( $user['UID'], $user['email'], $user['admin'] );
+			$dbUser->SetRealName( $user['realname'] );
+			array_push( $users, $dbUser );
+		}
+		
+		return $users;
+	}
 }
 
 class GuestUser extends User
@@ -124,12 +172,32 @@ class GuestUser extends User
 		return false;
 	}
 	
+	function SetAsAdmin( $newIsAdmin ) {
+		assert( false, "Called SetAsAdmin on GuestUser" );
+	}
+	
 	function GetEmail() {
 		return "guest";
 	}
 	
+	function SetEmail( $newEmail ) {
+		assert( false, "Called SetEmail on GuestUser" );
+	}
+	
+	function GetRealName() {
+		return "guest";
+	}
+	
+	function SetRealName( $realName ) {
+		assert( false, "Called SetFullName on GuestUser" );
+	}
+	
 	function GetUID() {
-		return -1;
+		return User::INVALID_UID;
+	}
+	
+	function CommitChanges() {
+		assert( false, "Called CommitChanges on GuestUser" );
 	}
 }
 
@@ -164,12 +232,33 @@ class RegisteredUser extends User
 		return $this->Admin;
 	}
 	
+	function SetAsAdmin( $newIsAdmin ) {
+		$this->Admin = $newIsAdmin;
+	}
+	
 	function GetEmail() {
 		return $this->Email;
 	}
 	
+	function SetEmail( $newEmail ) {
+		$this->Email = $newEmail;
+	}
+	
 	function GetUID() {
 		return $this->UID;
+	}
+	
+	function SetRealName( $realName ) {
+		$this->RealName = $realName;
+	}
+	
+	function GetRealName() {
+		return $this->RealName;
+	}
+	
+	function CommitChanges() {
+		$isAdmin = $this->Admin ? 1 : 0;
+		User::$DB->exec( "UPDATE users SET realname = '$this->RealName', admin = $isAdmin, email = '$this->Email' WHERE _ROWID_=$this->UID" );
 	}
 }
 

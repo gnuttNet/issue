@@ -56,5 +56,26 @@ if( $_POST["what"] == "changepassword" )
 	die();
 }
 
+if( $_POST["what"] == "updateuser" )
+{
+	$user = User::FromUID( $_POST['id'] );
+	if( $user != NULL )
+	{
+		// @TODO: Cleanse these from SQL-attack possibilities
+		$user->SetRealName( $_POST['realname'] );
+		$user->SetEmail( $_POST['email'] );
+		$asAdmin = isset($_POST['isadmin']);
+		$user->SetAsAdmin( $asAdmin );
+		$user->CommitChanges();
+	}
+	else
+	{
+		$_SESSION['ERROR'] = "Invalid user";
+	}
+
+	header("Location: ../usermanagement.php?id=1");
+	die();
+}
+
 die("UNDEFINED");
 ?>
