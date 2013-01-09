@@ -1,11 +1,12 @@
 <?php
 	include("include/header.php");
+	include_once("include/functions.php");
 
 	if( isset($_SESSION['ERROR']) ) {
 		echo "\t\t<p>{$_SESSION['ERROR']}</p>\n";
 		unset($_SESSION['ERROR']);
 	}
-
+	
 	if( !isset($_GET['id']) ) {
 		echo "\t\t<h1>User management</h1>\n";
 		echo "\t\t<form action=\"database/update.php\" method=\"post\">\n";
@@ -32,6 +33,22 @@
 			echo "\t\t\t\t</tr>\n";
 		}
 		echo "\t\t\t</table>\n";
+		echo "\t\t</form>\n";
+		echo "\t\t<h2>Add new user</h2>\n";
+		
+		$presetEmail = getPresetString( $_GET, 'email' );
+		$presetRealName = getPresetString( $_GET, 'realname' );
+		$presetAdmin = isset($_GET["admin"]) && $_GET["admin"] == "1" ? "checked=\"checked\"" : "";
+
+		echo "\t\t<form action=\"database/update.php\" method=\"post\">\n";
+		echo "\t\t\t<input type=\"hidden\" name=\"what\" value=\"adduser\" />\n";
+		echo "\t\t\t<label for=\"email\">Email:</label><input type=\"text\" name=\"email\" value=\"{$presetEmail}\" /><br />\n";
+		echo "\t\t\t<label for=\"realname\">Real Name:</label><input type=\"text\" name=\"realname\" value=\"{$presetRealName}\" /><br />\n";
+		echo "\t\t\t<label for=\"password\">Password:</label><input type=\"password\" name=\"password\" value=\"\" /><br />\n";
+		echo "\t\t\t<label for=\"confirm_password\">Confirm password:</label><input type=\"password\" name=\"confirm_password\" value=\"\" /><br />\n";
+		
+		echo "\t\t\t<label for=\"admin\">Is Admin:</label><input type=\"checkbox\" name=\"admin\" {$presetAdmin} /><br />\n";
+		echo "\t\t\t<input type=\"submit\" value=\"Add new user\" />\n";
 		echo "\t\t</form>\n";
 	} else if( $currentUser = User::FromUID( $_GET['id'] ) ) {
 		$realName = $currentUser->GetRealName();

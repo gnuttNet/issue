@@ -108,5 +108,39 @@ if( $_POST["what"] == "deleteusers" )
 	die();
 }
 
+if( $_POST["what"] == "adduser" )
+{
+	
+	if( $_POST["email"] != "" && $_POST["realname"] != "" && $_POST["password"] != "" && $_POST["confirm_password"] != "" )
+	{
+		if( $_POST["password"] == $_POST["confirm_password"] )
+		{
+			// @TODO: Add a proper query to verify if the email already exists
+			if( !User::CreateUser( $_POST["email"], $_POST["realname"], isset($_POST["admin"]), $_POST["password"] ) )
+			{
+				$_SESSION['ERROR'] = "Email already exists";
+			}
+		}
+		else
+		{
+			$_SESSION['ERROR'] = "Passwords doesn't match";
+		}
+	}
+	else
+	{
+		$_SESSION['ERROR'] = "Not all fields set";
+	}
+	
+	$additionalURL = "";
+	if( isset($_SESSION['ERROR']) )
+	{
+		$isAdmin = isset($_POST["admin"]) ? 1 : 0;
+		$additionalURL = "?email=".$_POST["email"]."&realname=".$_POST["realname"]."&admin=".$isAdmin;
+	}
+
+	header("Location: ../usermanagement.php".$additionalURL);
+	die();
+}
+
 die("UNDEFINED");
 ?>

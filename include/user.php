@@ -93,6 +93,17 @@ abstract class User {
 		return $dbUser;
 	}
 	
+	// @TODO: Add support for generating passwords
+	static function CreateUser( $email, $realName, $admin, $password )
+	{
+		$isAdmin = $admin ? 1 : 0;
+		$salt = generateRandomString( 8 );
+		$hashedPassword = sha1( $password.$salt );
+		
+		// suppress the error message and just return false if the is any issues
+		return @User::$DB->exec( "INSERT INTO users VALUES( '{$email}' ,'{$realName}','{$hashedPassword}','{$salt}', $isAdmin )" );
+	}
+	
 	static function DeleteFromUID( $UID ) {
 		User::$DB->exec("DELETE FROM users WHERE _ROWID_=$UID");
 	}
